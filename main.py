@@ -1,14 +1,10 @@
 import numpy as np
 
 from image_tools import SimpleImage, show_images
-from transformations import invert, horizontal_flip, apply_kernel, apply_kernel_fast, binarize
-
-# Color constants
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
+from transformations import invert, apply_kernel, apply_kernel_fast, binarize
 
 USE_OPENCV = True
+
 
 def main():
     images_to_display = []
@@ -17,9 +13,9 @@ def main():
 
     # Make an image with some colored blocks
     # img = SimpleImage()
-    # img.color_area((20, 30), (20, 30), RED, blend=True)  # red
-    # img.color_area((25, 33), (28, 40), GREEN, blend=True)  # green
-    # img.color_area((8, 18), (8, 18), BLUE, blend=True)  # blue
+    # img.color_area((20, 30), (20, 30), (255, 0, 0), blend=True)  # red
+    # img.color_area((25, 33), (28, 40), (0, 255, 0), blend=True)  # green
+    # img.color_area((8, 18), (8, 18), (0, 0, 255), blend=True)  # blue
 
     # Load an image from a file
     img = SimpleImage.from_file("images/josh_pic.png")
@@ -91,7 +87,6 @@ def main():
         [-1, 8, -1],
         [-1, -1, -1],
     ])
-
     edge_detected_img.apply(apply_kernel_method, kernel=gauss_kernel)
     edge_detected_img.apply(binarize, threshold=(100, 255))
     edge_detected_img.apply(apply_kernel_method, kernel=edge_detection_kernel)
