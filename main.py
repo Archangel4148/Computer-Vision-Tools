@@ -1,22 +1,29 @@
 import numpy as np
 
 from image_tools import SimpleImage, show_images
-from transformations import invert, horizontal_flip, apply_kernel
+from transformations import invert, horizontal_flip, apply_kernel, apply_kernel_fast, binarize
 
 # Color constants
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
+USE_OPENCV = True
 
 def main():
     images_to_display = []
 
+    apply_kernel_method = apply_kernel_fast if USE_OPENCV else apply_kernel
+
     # Make an image with some colored blocks
-    img = SimpleImage()
-    img.color_area((20, 30), (20, 30), RED, blend=True)  # red
-    img.color_area((25, 33), (28, 40), GREEN, blend=True)  # green
-    img.color_area((8, 18), (8, 18), BLUE, blend=True)  # blue
+    # img = SimpleImage()
+    # img.color_area((20, 30), (20, 30), RED, blend=True)  # red
+    # img.color_area((25, 33), (28, 40), GREEN, blend=True)  # green
+    # img.color_area((8, 18), (8, 18), BLUE, blend=True)  # blue
+
+    # Load an image from a file
+    img = SimpleImage.from_file("images/random_shapes.png")
+
     img.name = "Original Image"
     images_to_display.append(img)
 
@@ -27,62 +34,69 @@ def main():
     images_to_display.append(inverted_img)
 
     # Do a box blur on the original
-    transformed_img = img.copy()
-    box_kernel = np.array([
-        [1, 1, 1],
-        [1, 1, 1],
-        [1, 1, 1],
-    ]) / 9
-    transformed_img.apply(apply_kernel, kernel=box_kernel)
-    transformed_img.name = "Box Blur"
-    images_to_display.append(transformed_img)
-
-    # Load an image from a file
-    flower_img = SimpleImage.from_file("images/flower.jpg")
-    flower_img.name = "Flower Image"
-    images_to_display.append(flower_img)
-
-    # Invert the loaded image
-    inverted_flower = flower_img.copy()
-    inverted_flower.apply((invert, horizontal_flip))
-    inverted_flower.name = "Inverted/Flipped Flower Image"
-    images_to_display.append(inverted_flower)
+    binarized_img = img.copy()
+    binarized_img.apply(binarize, threshold=(100, 255))
+    binarized_img.name = "Binarize"
+    images_to_display.append(binarized_img)
 
     # Do a Gaussian blur on the image
-    gauss_flower = flower_img.copy()
+    gauss_img = img.copy()
     gauss_kernel = np.array([
         [1, 2, 1],
         [2, 4, 2],
         [1, 2, 1],
     ]) / 16
-    gauss_flower.apply(apply_kernel, kernel=gauss_kernel)
-    gauss_flower.name = "Gaussian Blur"
-    images_to_display.append(gauss_flower)
+    gauss_img.apply(apply_kernel_method, kernel=gauss_kernel)
+    gauss_img.name = "Gaussian Blur"
+    images_to_display.append(gauss_img)
 
     # Sharpen the image
-    sharp_flower = flower_img.copy()
+    sharp_img = img.copy()
     sharp_kernel = np.array([
         [0, -1, 0],
         [-1, 5, -1],
         [0, -1, 0],
     ])
-    sharp_flower.apply(apply_kernel, kernel=sharp_kernel)
-    sharp_flower.name = "Sharpen Filter"
-    images_to_display.append(sharp_flower)
+    sharp_img.apply(apply_kernel_method, kernel=sharp_kernel)
+
+    sharp_img.name = "Sharpen Filter"
+    images_to_display.append(sharp_img)
 
     # Emboss the image
-    embossed_flower = flower_img.copy()
+    embossed_img = img.copy()
     emboss_kernel = np.array([
         [-2, -1, 0],
         [-1, 1, 1],
         [0, 1, 2],
     ])
-    embossed_flower.apply(apply_kernel, kernel=emboss_kernel)
-    embossed_flower.name = "Emboss Filter"
-    images_to_display.append(embossed_flower)
+    embossed_img.apply(apply_kernel_method, kernel=emboss_kernel)
+    embossed_img.name = "Emboss Filter"
+    images_to_display.append(embossed_img)
+
+    # Edge detection
+    edge_detected_img = img.copy()
+    edge_detection_kernel = np.array([
+        [-1, -1, -1],
+        [-1, 8, -1],
+        [-1, -1, -1],
+    ])
+    edge_detected_img.apply(apply_kernel_method, kernel=edge_detection_kernel)
+    edge_detected_img.name = "Edge Detection"
+    images_to_display.append(edge_detected_img)
+
+    # Left-facing edge detection
+    left_detected_img = img.copy()
+    left_edge_kernel = np.array([
+        [-1, 0, 1],
+        [-1, 0, 1],
+        [-1, 0, 1],
+    ])
+    left_detected_img.apply(apply_kernel_method, kernel=left_edge_kernel)
+    left_detected_img.name = "Left Edge Detection"
+    images_to_display.append(left_detected_img)
 
     # Display the images
-    show_images(images_to_display, images_per_row=3)
+    show_images(images_to_display, images_per_row=4)
 
 
 if __name__ == '__main__':
