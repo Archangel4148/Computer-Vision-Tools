@@ -1,7 +1,7 @@
 import numpy as np
 from PIL import Image
 
-from transformations import invert, horizontal_flip
+from transformations import invert, horizontal_flip, vertical_flip
 
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
@@ -111,6 +111,12 @@ def main():
     inverted_img.name = "Inverted Image"
     images_to_display.append(inverted_img)
 
+    # Do all the transforms on the original
+    transformed_img = img.copy()
+    transformed_img.apply((invert, horizontal_flip, vertical_flip))
+    transformed_img.name = "All the Transforms"
+    images_to_display.append(transformed_img)
+
     # Load an image from a file
     flower_img = SimpleImage.from_file("images/flower.jpg")
     flower_img.name = "Flower Image"
@@ -123,7 +129,7 @@ def main():
     images_to_display.append(inverted_flower)
 
     # Display all the images
-    show_images(images_to_display, images_per_row=2)
+    show_images(images_to_display, images_per_row=3)
 
 
 if __name__ == '__main__':
