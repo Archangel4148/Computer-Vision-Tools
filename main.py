@@ -11,9 +11,10 @@ BLUE = (0, 0, 255)
 class SimpleImage:
     def __init__(self, width=50, height=50):
         # Create a blank image (black)
-        self.width = width
-        self.height = height
+        self.width: int = width
+        self.height: int = height
         self.data = np.zeros((height, width, 3), dtype=np.uint8)
+        self.name: str | None = None
 
     def color_area(self, x_range, y_range, color, blend=False):
         """Set the area in the range to color (r, g, b)"""
@@ -58,16 +59,15 @@ class SimpleImage:
 import matplotlib.pyplot as plt
 
 
-def show_images(images: list[SimpleImage], titles: list[str] = None, cols: int = None, images_per_row: int = 3,
-                figsize=(10, 5)):
+def show_images(images: list[SimpleImage], cols: int = None, images_per_row: int = 3, fig_size=(10, 5)):
     """Displays a list of images in a grid"""
     n = len(images)
-    rows = (n -1 ) // images_per_row + 1
+    rows = (n - 1) // images_per_row + 1
 
     if cols is None:
         cols = n if n <= images_per_row else images_per_row
 
-    fig, axes = plt.subplots(rows, cols, figsize=figsize)
+    fig, axes = plt.subplots(rows, cols, figsize=fig_size)
     axes = axes.flatten()  # Make it 1D so it's easy to loop through
 
     for i, img in enumerate(images):
@@ -75,8 +75,8 @@ def show_images(images: list[SimpleImage], titles: list[str] = None, cols: int =
         data = img.data if isinstance(img, SimpleImage) else img
         axes[i].imshow(data)
         axes[i].axis('off')
-        if titles and i < len(titles):
-            axes[i].set_title(titles[i])
+        if img.name is not None:
+            axes[i].set_title(img.name)
 
     # Turn off any extra axes
     for j in range(i + 1, len(axes)):
@@ -87,19 +87,35 @@ def show_images(images: list[SimpleImage], titles: list[str] = None, cols: int =
 
 
 def main():
-    img = SimpleImage()
+    images_to_display = []
 
-    # Draw some colored blocks
+    # Make an image with some colored blocks
+    img = SimpleImage()
     img.color_area((20, 30), (20, 30), RED, blend=True)  # red
     img.color_area((25, 33), (28, 40), GREEN, blend=True)  # green
     img.color_area((8, 18), (8, 18), BLUE, blend=True)  # blue
+    img.name = "Original Image"
+    images_to_display.append(img)
 
+    # Create an inverted version of the image
     inverted_img = img.copy()
     inverted_img.apply(invert)
+    inverted_img.name = "Inverted Image"
+    images_to_display.append(inverted_img)
 
+    # Load an image from a file
     flower_img = SimpleImage.from_file("images/flower.jpg")
+    flower_img.name = "Flower Image"
+    images_to_display.append(flower_img)
 
-    show_images([img, inverted_img, flower_img], ["Original Image", "Inverted Image", "Flower Image"])
+    # Invert the loaded image
+    inverted_flower = flower_img.copy()
+    inverted_flower.apply(invert)
+    inverted_flower.name = "Inverted Flower Image"
+    images_to_display.append(inverted_flower)
+
+    # Display all the images
+    show_images(images_to_display, images_per_row=2)
 
 
 if __name__ == '__main__':
