@@ -46,6 +46,11 @@ class SimpleImage:
         new_img.data = self.data.copy()
         return new_img
 
+    def save(self, save_path: str):
+        """Save the image to a file"""
+        img = Image.fromarray(self.data.astype(np.uint8), "RGB")
+        img.save(save_path)
+
     @classmethod
     def from_file(cls, filepath):
         """Create a SimpleImage from an image file."""

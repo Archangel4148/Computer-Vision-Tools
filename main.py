@@ -1,5 +1,7 @@
+import numpy as np
+
 from image_tools import SimpleImage, show_images
-from transformations import invert, horizontal_flip, vertical_flip
+from transformations import invert, horizontal_flip, apply_kernel
 
 # Color constants
 RED = (255, 0, 0)
@@ -24,10 +26,15 @@ def main():
     inverted_img.name = "Inverted Image"
     images_to_display.append(inverted_img)
 
-    # Do all the transforms on the original
+    # Do a box blur on the original
     transformed_img = img.copy()
-    transformed_img.apply((invert, horizontal_flip, vertical_flip))
-    transformed_img.name = "All the Transforms"
+    box_kernel = np.array([
+        [1, 1, 1],
+        [1, 1, 1],
+        [1, 1, 1],
+    ]) / 9
+    transformed_img.apply(apply_kernel, kernel=box_kernel)
+    transformed_img.name = "Box Blur"
     images_to_display.append(transformed_img)
 
     # Load an image from a file
@@ -40,6 +47,17 @@ def main():
     inverted_flower.apply((invert, horizontal_flip))
     inverted_flower.name = "Inverted/Flipped Flower Image"
     images_to_display.append(inverted_flower)
+
+    # Do a Gaussian blur on the image
+    gauss_flower = flower_img.copy()
+    gauss_kernel = np.array([
+        [1, 2, 1],
+        [2, 4, 2],
+        [1, 2, 1],
+    ]) / 16
+    gauss_flower.apply(apply_kernel, kernel=gauss_kernel)
+    gauss_flower.name = "Gaussian Blur"
+    images_to_display.append(gauss_flower)
 
     # Display all the images
     show_images(images_to_display, images_per_row=3)
