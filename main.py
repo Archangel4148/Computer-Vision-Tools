@@ -1,7 +1,7 @@
 import numpy as np
 from PIL import Image
 
-from transformations import invert
+from transformations import invert, horizontal_flip
 
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
@@ -28,9 +28,17 @@ class SimpleImage:
         else:
             area[:, :, :] = color
 
-    def apply(self, func, **kwargs):
-        """Apply a transformation to the image (pass in a function)"""
-        self.data = func(self.data, **kwargs)
+    def apply(self, funcs, **kwargs):
+        """Apply one or more transformation functions to the image (every function is given kwargs)"""
+        if callable(funcs):
+            # Single function
+            self.data = funcs(self.data, **kwargs)
+        elif isinstance(funcs, (list, tuple)):
+            # Apply each function in sequence
+            for func in funcs:
+                self.data = func(self.data, **kwargs)
+        else:
+            raise TypeError(f"Invalid transformation(s) for apply(): {funcs}")
 
     def show(self, title=None):
         """Display the image"""
@@ -110,8 +118,8 @@ def main():
 
     # Invert the loaded image
     inverted_flower = flower_img.copy()
-    inverted_flower.apply(invert)
-    inverted_flower.name = "Inverted Flower Image"
+    inverted_flower.apply((invert, horizontal_flip))
+    inverted_flower.name = "Inverted/Flipped Flower Image"
     images_to_display.append(inverted_flower)
 
     # Display all the images
