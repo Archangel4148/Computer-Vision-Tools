@@ -22,7 +22,7 @@ def main():
     # img.color_area((8, 18), (8, 18), BLUE, blend=True)  # blue
 
     # Load an image from a file
-    img = SimpleImage.from_file("images/random_shapes.png")
+    img = SimpleImage.from_file("images/josh_pic.png")
 
     img.name = "Original Image"
     images_to_display.append(img)
@@ -73,17 +73,6 @@ def main():
     embossed_img.name = "Emboss Filter"
     images_to_display.append(embossed_img)
 
-    # Edge detection
-    edge_detected_img = img.copy()
-    edge_detection_kernel = np.array([
-        [-1, -1, -1],
-        [-1, 8, -1],
-        [-1, -1, -1],
-    ])
-    edge_detected_img.apply(apply_kernel_method, kernel=edge_detection_kernel)
-    edge_detected_img.name = "Edge Detection"
-    images_to_display.append(edge_detected_img)
-
     # Left-facing edge detection
     left_detected_img = img.copy()
     left_edge_kernel = np.array([
@@ -94,6 +83,20 @@ def main():
     left_detected_img.apply(apply_kernel_method, kernel=left_edge_kernel)
     left_detected_img.name = "Left Edge Detection"
     images_to_display.append(left_detected_img)
+
+    # Edge detection (Gaussian blur, then binarize, then use edge detection kernel)
+    edge_detected_img = img.copy()
+    edge_detection_kernel = np.array([
+        [-1, -1, -1],
+        [-1, 8, -1],
+        [-1, -1, -1],
+    ])
+
+    edge_detected_img.apply(apply_kernel_method, kernel=gauss_kernel)
+    edge_detected_img.apply(binarize, threshold=(100, 255))
+    edge_detected_img.apply(apply_kernel_method, kernel=edge_detection_kernel)
+    edge_detected_img.name = "Edge Detection"
+    images_to_display.append(edge_detected_img)
 
     # Display the images
     show_images(images_to_display, images_per_row=4)
