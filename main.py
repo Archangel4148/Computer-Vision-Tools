@@ -59,7 +59,29 @@ def main():
     gauss_flower.name = "Gaussian Blur"
     images_to_display.append(gauss_flower)
 
-    # Display all the images
+    # Sharpen the image
+    sharp_flower = flower_img.copy()
+    sharp_kernel = np.array([
+        [0, -1, 0],
+        [-1, 5, -1],
+        [0, -1, 0],
+    ])
+    sharp_flower.apply(apply_kernel, kernel=sharp_kernel)
+    sharp_flower.name = "Sharpen Filter"
+    images_to_display.append(sharp_flower)
+
+    # Emboss the image
+    embossed_flower = flower_img.copy()
+    emboss_kernel = np.array([
+        [-2, -1, 0],
+        [-1, 1, 1],
+        [0, 1, 2],
+    ])
+    embossed_flower.apply(apply_kernel, kernel=emboss_kernel)
+    embossed_flower.name = "Emboss Filter"
+    images_to_display.append(embossed_flower)
+
+    # Display the images
     show_images(images_to_display, images_per_row=3)
 
 
